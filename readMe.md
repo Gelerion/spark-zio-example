@@ -1,0 +1,1 @@
+Example application that leverages [ZIO](https://github.com/zio/zio) for writing fully functional code in Spark/Scala
