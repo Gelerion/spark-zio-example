@@ -13,7 +13,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import zio.{DefaultRuntime, Task, ZIO}
 
 //inspired by https://github.com/jdegoes/scalaua-2019/blob/master/src/main/scala/net/degoes/ThinkingFunctionally.scala
-object CohortZio {
+object Application {
   val runtime: DefaultRuntime = new DefaultRuntime {}
   type Services = Cardinality with CardinalityReader with Spark with Reader
 
@@ -33,10 +33,10 @@ object CohortZio {
     }
 
     //Production:
-    runtime.unsafeRun(cohort.provide(liveServices))
+    runtime.unsafeRun(application.provide(liveServices))
   }
 
-  def cohort: ZIO[Services, Throwable, DataFrame] = {
+  def application: ZIO[Services, Throwable, DataFrame] = {
     for {
       baseDf           <- reader.parquet("abc/parquet")
       afterCardinality <- cardinalityModule.applyCardinality(fields, loadRangeSpec, baseDf)
@@ -54,7 +54,7 @@ object Test {
     val program: ZIO[Cardinality with CardinalityReader with Spark, Throwable, DataFrame] =
       for {
         //the same code path, different services/input
-        result <- cardinalityModule.applyCardinality(CohortZio.fields, CohortZio.loadRangeSpec, input)
+        result <- cardinalityModule.applyCardinality(Application.fields, Application.loadRangeSpec, input)
       } yield result
 
     //define test services
